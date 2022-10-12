@@ -1,1 +1,1 @@
-# maj-api
+# MajAPI

@@ -1,0 +1,6 @@
+### Phalcon ###
+/cache/
+/config/development/
+/.git/
+/.idea/
+/.phalcon/
