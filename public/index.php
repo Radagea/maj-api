@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 use Phalcon\Di\FactoryDefault;
+use Phalcon\Flash\Session as FlashSession;
+use Phalcon\Escaper;
 
 error_reporting(E_ALL);
 
@@ -14,7 +16,6 @@ try {
      * the services that provide a full stack framework.
      */
     $di = new FactoryDefault();
-
     /**
      * Read services
      */
@@ -34,6 +35,28 @@ try {
      * Include Autoloader
      */
     include APP_PATH . '/config/loader.php';
+
+    $session = new \Phalcon\Session\Manager();
+    $escaper = new Escaper();
+    $files = new \Phalcon\Session\Adapter\Stream(['savePath' => session_save_path()]);
+    $session->setAdapter($files);
+    $session->start();
+
+    $di->set(
+        'flashSession',
+        function () use ($escaper, $session) {
+            $flash = new FlashSession($escaper, $session);
+            $flash->setCssClasses(
+                [
+                    'error'   => 'alert alert-danger',
+                    'success' => 'alert alert-success',
+                    'notice'  => 'alert alert-info',
+                    'warning' => 'alert alert-warning',
+                ]
+            );
+            return $flash;
+        }
+    );
 
     /**
      * Handle the request

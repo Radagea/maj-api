@@ -11,9 +11,9 @@ return new \Phalcon\Config([
     'database' => [
         'adapter'     => 'Mysql',
         'host'        => 'localhost',
-        'username'    => 'root',
-        'password'    => '',
-        'dbname'      => 'test',
+        'username'    => 'phalcon-test',
+        'password'    => 'phalcon-test',
+        'dbname'      => 'maj-api',
         'charset'     => 'utf8',
     ],
     'application' => [

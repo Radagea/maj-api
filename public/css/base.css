@@ -1,0 +1,33 @@
+.auth-form {
+    margin-top: 10%;
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 800px;
+}
+
+.main-content {
+    margin-top: 2vh;
+}
+
+.endpoint-list {
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.endpoint-list:hover {
+    background-color: #e2e0e0;
+}
+
+.enable-circle {
+    height: 20px;
+    width: 20px;
+    border-radius: 20px;
+}
+
+.color-red {
+    background-color: red;
+}
+
+.color-green {
+    background-color: green;
+}
