@@ -38,6 +38,7 @@ class RegisterController extends ControllerBase
             $user->password = $security->hash($pass);
             $user->email = $this->request->getPost('email');
 
+            $user->createUri();
             $success = $user->save();
 
             if ($success) {

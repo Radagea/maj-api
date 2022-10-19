@@ -1,3 +1,13 @@
+.clear::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.row:not(:last-child) {
+    margin-bottom: 1.5rem;
+}
+
 .auth-form {
     margin-top: 10%;
     margin-right: auto;
@@ -9,25 +19,44 @@
     margin-top: 2vh;
 }
 
-.endpoint-list {
+.one-of-all {
+    background-color: #eaebed;
+    padding: .5rem 1rem;
     cursor: pointer;
-    transition: 0.2s;
+    border-radius: 5px;
+    transition: all .2s;
+    position: relative;
 }
 
-.endpoint-list:hover {
-    background-color: #e2e0e0;
+.title-of-list-element {
+    float: left;
 }
 
-.enable-circle {
-    height: 20px;
-    width: 20px;
+.turn-on-section {
+    float: right;
+}
+
+.indicator {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
     border-radius: 20px;
+    height: 10px;
+    width: 10px;
 }
 
-.color-red {
+.turn-on-section .green {
+    background-color: green;
+}
+
+.turn-on-section .red {
     background-color: red;
 }
 
-.color-green {
-    background-color: green;
+.one-of-all:hover {
+    background-color: #f4f4f4;
+}
+
+.form-check-input {
+    cursor: pointer;
 }
