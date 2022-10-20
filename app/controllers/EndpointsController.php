@@ -8,6 +8,54 @@ class EndpointsController extends ControllerBase
         $user = Users::getUserById($this->session->get('user_id'));
         $this->view->user_uri = $user->unique_uri;
         $this->view->globalEndpoints = GlobalEndpoints::getGlobalEndpointsByUserId($user->id);
+
+        $this->view->endpointsTest = [
+            [
+                'title' => 'Lorem ipsum dolor',
+                'desc' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sodales nisl sapien, sed ultrices ipsum malesuada at.',
+                'enabled' => 0,
+            ],
+            [
+                'title' => 'Lorem ipsum dolor 2',
+                'desc' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sodales nisl sapien, sed ultrices ipsum malesuada at.',
+                'enabled' => 1,
+            ],
+            [
+                'title' => 'Lorem ipsum dolor 3',
+                'desc' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sodales nisl sapien, sed ultrices ipsum malesuada at.',
+                'enabled' => 0,
+            ],
+            [
+                'title' => 'Lorem ipsum dolor 2',
+                'desc' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sodales nisl sapien, sed ultrices ipsum malesuada at.',
+                'enabled' => 1,
+            ],
+            [
+                'title' => 'Lorem ipsum dolor 3',
+                'desc' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sodales nisl sapien, sed ultrices ipsum malesuada at.',
+                'enabled' => 0,
+            ],
+            [
+                'title' => 'Lorem ipsum dolor 2',
+                'desc' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sodales nisl sapien, sed ultrices ipsum malesuada at.',
+                'enabled' => 1,
+            ],
+            [
+                'title' => 'Lorem ipsum dolor 3',
+                'desc' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sodales nisl sapien, sed ultrices ipsum malesuada at.',
+                'enabled' => 0,
+            ],
+            [
+                'title' => 'Lorem ipsum dolor 2',
+                'desc' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sodales nisl sapien, sed ultrices ipsum malesuada at.',
+                'enabled' => 1,
+            ],
+            [
+                'title' => 'Lorem ipsum dolor 3',
+                'desc' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sodales nisl sapien, sed ultrices ipsum malesuada at.',
+                'enabled' => 0,
+            ],
+        ];
     }
 
     public function editAction()
@@ -36,7 +84,7 @@ class EndpointsController extends ControllerBase
         }
 
         /** @var GlobalEndpoints $global_endpoint */
-        $global_endpoint = GlobalEndpoints::findFirst('id = '.$endpoint_id);
+        $global_endpoint = GlobalEndpoints::findFirst('id = ' . $endpoint_id);
 
         if ($this->request->hasPost('isEnabled')) {
             $global_endpoint->enabled = 1;

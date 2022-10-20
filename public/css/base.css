@@ -4,6 +4,10 @@
     clear: both;
 }
 
+h2 {
+    font-size: 2rem;
+}
+
 .row:not(:last-child) {
     margin-bottom: 1.5rem;
 }
@@ -49,7 +53,7 @@
     background-color: green;
 }
 
-.turn-on-section .red {
+.red {
     background-color: red;
 }
 
@@ -59,4 +63,41 @@
 
 .form-check-input {
     cursor: pointer;
+}
+
+.add-new-endpoint {
+    float: right;
+    font-size: 2rem;
+}
+
+.add-new-endpoint i {
+    cursor: pointer;
+    color: #0D6EFD;
+    transition: color .1s;
+}
+
+.add-new-endpoint i:hover {
+    color: #0a44a5;
+}
+
+.custom-endpoint-card {
+    height: 10rem;
+    cursor: pointer;
+    transition: background-color .2s;
+}
+
+.custom-endpoint-card:hover {
+    background-color: #f4f4f4;
+}
+
+.custom-endpoint-card h5 {
+    text-align: center;
+}
+
+.custom-endpoint-card--inactive {
+    border-bottom-color: red;
+}
+
+.custom-endpoint-card--active {
+    border-bottom-color: green;
 }
