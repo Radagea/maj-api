@@ -11,6 +11,12 @@
                 <li class="nav-item {% if router.getControllerName() == 'endpoints' %} active {% endif %}">
                     <a class="nav-link" href="/endpoints">Endpoints</a>
                 </li>
+                <li class="nav-item {% if router.getControllerName() == 'datasets' %} active {% endif %}">
+                    <a class="nav-link" href="/datasets">Datasets</a>
+                </li>
+                <li class="nav-item {% if router.getControllerName() == 'apicaller' %} active {% endif %}">
+                    <a class="nav-link" href="/api-caller">API Caller</a>
+                </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if session.has('username') %}

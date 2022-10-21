@@ -32,4 +32,42 @@ class Endpoints extends Model
             )
         );
     }
+
+    public static function normalizeURI($uri,$user_id)
+    {
+        $endpoint_uri = $uri;
+        $endpoint_uri = strtolower($endpoint_uri);
+        $endpoint_uri = str_replace(' ', '-', $endpoint_uri);
+        $endpoint_uri = str_replace(['\'', '"', ',' , ';', '<', '>', '.'], '', $endpoint_uri);
+        if ($count = self::countUriForUser($endpoint_uri, $user_id) > 0) {
+            $endpoint_uri .= '-'.$count;
+        }
+        return $endpoint_uri;
+    }
+
+    public static function countUriForUser($uri, $user_id)
+    {
+        return Endpoints::count(
+            [
+                'conditions' => 'user_id = :user_id: AND endpoint_uri = :uri:',
+                'bind' => [
+                    'user_id' => $user_id,
+                    'uri' => $uri,
+                ],
+            ]
+        );
+    }
+
+    public static function hasPermission($endpoint_id, $user_id)
+    {
+        return Endpoints::count(
+            [
+                'conditions' => 'id = :endpoint_id: AND user_id = :user_id:',
+                'bind' => [
+                    'endpoint_id' => $endpoint_id,
+                    'user_id' => $user_id,
+                ],
+            ]
+        );
+    }
 }
