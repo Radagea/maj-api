@@ -39,4 +39,16 @@ class Users extends Model
             ]
         );
     }
+
+    public static function getUserIdByUniqueUri($unique_uri)
+    {
+        $user = Users::findFirst([
+            'conditions' => 'unique_uri = :unique_uri:',
+            'bind' => [
+                'unique_uri' => $unique_uri,
+            ],
+        ]);
+
+        return $user->id;
+    }
 }

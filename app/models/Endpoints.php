@@ -39,9 +39,19 @@ class Endpoints extends Model
         $endpoint_uri = strtolower($endpoint_uri);
         $endpoint_uri = str_replace(' ', '-', $endpoint_uri);
         $endpoint_uri = str_replace(['\'', '"', ',' , ';', '<', '>', '.'], '', $endpoint_uri);
-        if ($count = self::countUriForUser($endpoint_uri, $user_id) > 0) {
-            $endpoint_uri .= '-'.$count;
+        $count = 1;
+        while($count > 0) {
+            $count = self::countUriForUser($endpoint_uri, $user_id);
+            if ($count > 0) {
+                $modifier = '';
+                for ($i = 0; $i < 4; $i++) {
+                    $num = rand(0,9);
+                    $modifier .= (string)$num;
+                }
+                $endpoint_uri .= '-'.$modifier;
+            }
         }
+
         return $endpoint_uri;
     }
 
@@ -66,6 +76,31 @@ class Endpoints extends Model
                 'bind' => [
                     'endpoint_id' => $endpoint_id,
                     'user_id' => $user_id,
+                ],
+            ]
+        );
+    }
+
+    public static function countUserEndpoints($user_id)
+    {
+        return Endpoints::count(
+            [
+                'conditions' => 'user_id = :user_id:',
+                'bind' => [
+                    'user_id' => $user_id,
+                ],
+            ]
+        );
+    }
+
+    public static function getEndpointByUserAndEndpointUri($user_id,$endpoint_uri)
+    {
+        return Endpoints::findFirst(
+            [
+                'conditions' => 'user_id = :user_id: AND endpoint_uri = :endpoint_uri:',
+                'bind' => [
+                    'user_id' => $user_id,
+                    'endpoint_uri' => $endpoint_uri,
                 ],
             ]
         );

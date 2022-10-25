@@ -69,6 +69,14 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-7">
+                                    <p>Current URI</p>
+                                </div>
+                                <div class="col-lg-5">
+                                    <input class="form-control" name="endpoint-uri" type="text" value="/apis/{{ user_uri }}/{{ endpoint.endpoint_uri }}" disabled>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-7">
                                     <p>Description</p>
                                 </div>
                                 <div class="col-lg-5">

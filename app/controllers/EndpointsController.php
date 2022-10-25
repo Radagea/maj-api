@@ -8,7 +8,7 @@ class EndpointsController extends ControllerBase
         $user = Users::getUserById($this->session->get('user_id'));
         $this->view->user_uri = $user->unique_uri;
         $this->view->globalEndpoints = GlobalEndpoints::getGlobalEndpointsByUserId($user->id);
-
+        $this->view->endpointCount = Endpoints::countUserEndpoints($user->id);
         $this->view->endpointsTest = Endpoints::find([
             'conditions' => 'user_id = :user_id:',
             'bind' => [
@@ -41,6 +41,10 @@ class EndpointsController extends ControllerBase
         try {
             if (!$this->request->hasPost('createEndpoint')) {
                 throw new Exception('There is a problem');
+            }
+
+            if (Endpoints::countUserEndpoints($this->session->get('user_id')) === 15) {
+                throw new Exception('You have too many endpoints');
             }
 
             $endpoint = new Endpoints();

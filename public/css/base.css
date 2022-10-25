@@ -36,6 +36,10 @@ h2 {
     float: left;
 }
 
+.endpoint-count {
+    margin-left: 1rem;
+}
+
 .turn-on-section {
     float: right;
 }
