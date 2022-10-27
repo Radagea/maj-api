@@ -5,7 +5,8 @@ use Phalcon\Mvc\Model;
 class GlobalEndpoints extends Model
 {
     public $id;
-    public $user_id;
+    protected $user_id;
+    public $user;
     public $endpoint_name;
     public $endpoint_uri;
     public $enabled;
@@ -14,6 +15,16 @@ class GlobalEndpoints extends Model
 
     public function initialize() {
         $this->setSource('user_global_endpoint');
+    }
+
+    public function afterFetch()
+    {
+        $this->user = Users::findFirst([
+            'conditions' => 'id = :user_id:',
+            'bind' => [
+                'user_id' => $this->user_id,
+            ]
+        ]);
     }
 
     public static function getGlobalEndpointsByUserId($user_id)
@@ -52,5 +63,18 @@ class GlobalEndpoints extends Model
             $global_endpoint->endpoint_uri = $global_endpoint_type->endpoint_uri;
             $global_endpoint->save();
         }
+    }
+
+    public static function getEndpointByUserAndEndpointUri($user_id,$endpoint_uri)
+    {
+        return GlobalEndpoints::findFirst(
+            [
+                'conditions' => 'user_id = :user_id: AND endpoint_uri = :endpoint_uri: AND enabled = 1',
+                'bind' => [
+                    'user_id' => $user_id,
+                    'endpoint_uri' => $endpoint_uri,
+                ],
+            ]
+        );
     }
 }

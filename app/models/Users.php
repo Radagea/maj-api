@@ -49,6 +49,10 @@ class Users extends Model
             ],
         ]);
 
+        if (!$user) {
+            return false;
+        }
+
         return $user->id;
     }
 }

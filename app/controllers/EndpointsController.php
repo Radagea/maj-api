@@ -4,6 +4,7 @@ class EndpointsController extends ControllerBase
 {
     public function indexAction()
     {
+        $this->assets->addJs('js/ge_add_user_group.js');
         /** @var Users $user */
         $user = Users::getUserById($this->session->get('user_id'));
         $this->view->user_uri = $user->unique_uri;
@@ -12,9 +13,21 @@ class EndpointsController extends ControllerBase
         $this->view->endpointsTest = Endpoints::find([
             'conditions' => 'user_id = :user_id:',
             'bind' => [
-                'user_id' => $this->session->get('user_id')
-            ]
+                'user_id' => $this->session->get('user_id'),
+            ],
         ]);
+        $this->view->user_groups = GeAuthUserGroups::getFromUserId($user->id);
+        $this->view->old_groups_id = $this->makeOldGroupsid($this->view->user_groups);
+    }
+
+    protected function makeOldGroupsid($user_groups)
+    {
+        $string = '';
+        foreach ($user_groups as $user_group) {
+            $identifier = $user_group->unique_identifier;
+            $string .= $identifier . ',';
+        }
+        return substr($string, 0, -1);
     }
 
     public function editAction()
@@ -37,7 +50,8 @@ class EndpointsController extends ControllerBase
         $this->response->redirect('/endpoints');
     }
 
-    public function createAction(){
+    public function createAction()
+    {
         try {
             if (!$this->request->hasPost('createEndpoint')) {
                 throw new Exception('There is a problem');
@@ -110,6 +124,51 @@ class EndpointsController extends ControllerBase
         }
 
         $success = $global_endpoint->update();
+
+        //User groups for the authentication global endpoints
+        if ($global_endpoint->endpoint_type == 2) {
+            $new_groups = explode(',', $this->request->getPost('new-groups'));
+            $deleted_old_groups = explode(',', $this->request->getPost('deleted-old-groups'));
+            $old_groups = explode(',', $this->request->getPost('old-groups'));
+            $default = $this->request->getPost('default-user-group-radio');
+
+            //NEW GROUPS
+            foreach ($new_groups as $new_group) {
+                $user_group = new GeAuthUserGroups();
+                $user_group->setUserId($this->session->get('user_id'));
+                $user_group->setGeId($global_endpoint->id);
+                $user_group->name = $this->request->getPost($new_group . '-name');
+                $user_group->unique_identifier = GeAuthUserGroups::createUniqId($global_endpoint->user->username);
+                if ($new_group == $default) {
+                    $user_group->is_default = 1;
+                }
+                $success = $user_group->save();
+            }
+
+            //Old groups
+            foreach ($old_groups as $old_group) {
+                /** @var GeAuthUserGroups $user_group */
+                $user_group = GeAuthUserGroups::getFirstFromUserIdAndUniqId($this->session->get('user_id'), $old_group);
+                $user_group->name = $this->request->getPost($old_group . '-name');
+                if ($old_group == $default) {
+                    $user_group->is_default = 1;
+                } else {
+                    $user_group->is_default = 0;
+                }
+                $success = $user_group->save();
+            }
+
+            //Deleted old groups
+            foreach ($deleted_old_groups as $deleted_old_group) {
+                /** @var GeAuthUserGroups $user_group */
+                $deleted_user_group = GeAuthUserGroups::getFirstFromUserIdAndUniqId($this->session->get('user_id'), $deleted_old_group);
+                //TODO replace all users in this group into the default one
+                if($deleted_user_group != null) {
+                    $success = $deleted_user_group->delete();
+                }
+            }
+        }
+
         if ($success) {
             $this->flashSession->success('Endpoint has been saved');
         }

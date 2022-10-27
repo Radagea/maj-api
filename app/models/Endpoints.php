@@ -6,7 +6,8 @@ use Phalcon\Mvc\Model\Behavior\Timestampable;
 class Endpoints extends Model
 {
     public $id;
-    public $user_id;
+    protected $user_id;
+    public $user;
     public $endpoint_name;
     public $endpoint_uri;
     public $enabled;
@@ -31,6 +32,16 @@ class Endpoints extends Model
                 ]
             )
         );
+    }
+
+    public function afterFetch()
+    {
+        $this->user = Users::findFirst([
+            'conditions' => 'id = :user_id:',
+            'bind' => [
+                'user_id' => $this->user_id,
+            ]
+        ]);
     }
 
     public static function normalizeURI($uri,$user_id)
@@ -97,10 +108,22 @@ class Endpoints extends Model
     {
         return Endpoints::findFirst(
             [
-                'conditions' => 'user_id = :user_id: AND endpoint_uri = :endpoint_uri:',
+                'conditions' => 'user_id = :user_id: AND endpoint_uri = :endpoint_uri: AND enabled = 1',
                 'bind' => [
                     'user_id' => $user_id,
                     'endpoint_uri' => $endpoint_uri,
+                ],
+            ]
+        );
+    }
+
+    public static function getEndpointsByUserId($user_id)
+    {
+        return Endpoints::find(
+            [
+                'conditions' => 'user_id = :user_id:',
+                'bind' => [
+                    'user_id' => $user_id,
                 ],
             ]
         );

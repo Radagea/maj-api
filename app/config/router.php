@@ -9,6 +9,18 @@ $router->add('/apis/{user_uri}',
     ]
 );
 
+$router->add('/apis/{user_uri}/',
+    [
+        'controller' => 'apis',
+    ]
+);
+
+$router->add('/apis/{user_uri}/{endpoint}/',
+    [
+        'controller' => 'apis',
+    ]
+);
+
 $router->add('/apis/{user_uri}/{endpoint}',
     [
         'controller' => 'apis',
