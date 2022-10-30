@@ -1,4 +1,3 @@
-
 let new_groups = 0;
 let new_groups_arr = [];
 let old_groups_arr = [];

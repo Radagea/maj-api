@@ -141,6 +141,8 @@ class EndpointsController extends ControllerBase
                 $user_group->unique_identifier = GeAuthUserGroups::createUniqId($global_endpoint->user->username);
                 if ($new_group == $default) {
                     $user_group->is_default = 1;
+                } else {
+                    $user_group->is_default = 0;
                 }
                 $success = $user_group->save();
             }

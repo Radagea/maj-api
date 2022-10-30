@@ -66,15 +66,6 @@ class ControllerApiBase extends Controller
         }
     }
 
-    public function putError($message, $code = 404)
-    {
-        $this->response_content = [
-            'response_code' => $code,
-            'message' => $message,
-        ];
-        $this->response->setStatusCode($code);
-    }
-
     public function globalEndpointList()
     {
         $this->response_content['num'] = Endpoints::countUserEndpoints($this->user_id);
@@ -93,13 +84,29 @@ class ControllerApiBase extends Controller
         $this->response_content['endpoints'] = $endpoints_to_content;
     }
 
-    public function globalEndpointAuthUser()
-    {
-        $this->response_content['message'] = 'auth-user';
-    }
-
     public function globalEndpointAuth()
     {
         $this->response_content['message'] = 'auth';
+        $this->response_content['user'] = $this->user_uri;
+        $this->response_content['global_endpoint'] = $this->global_endpoint;
+    }
+
+    protected function globalEndpointAuth_POST_register()
+    {
+
+    }
+
+    protected function globalEndpointAuth_POST_login()
+    {
+
+    }
+
+    public function putError($message, $code = 404)
+    {
+        $this->response_content = [
+            'response_code' => $code,
+            'message' => $message,
+        ];
+        $this->response->setStatusCode($code);
     }
 }

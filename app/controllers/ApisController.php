@@ -17,9 +17,6 @@ class ApisController extends ControllerApiBase
                 case 2:
                     $this->globalEndpointAuth();
                     break;
-                case 3:
-                    $this->globalEndpointAuthUser();
-                    break;
                 default:
                     $this->putError('Endpoint is invalid');
                     break;
