@@ -56,6 +56,16 @@ class GeAuthUserGroups extends Model
         ]);
     }
 
+    public static function getDefaultFromUserId($user_id) {
+        return GeAuthUserGroups::findFirst([
+            'conditions' => 'user_id = :user_id: AND is_default = :is_default:',
+            'bind' => [
+                'user_id' => $user_id,
+                'is_default' => 1
+            ],
+        ]);
+    }
+
     public static function getFirstFromUserIdAndUniqId($user_id, $uniq_id)
     {
         return GeAuthUserGroups::findFirst([
@@ -67,7 +77,7 @@ class GeAuthUserGroups extends Model
         ]);
     }
 
-    public static function createUniqId($username)
+    public static function createUniqId($username,$user_id)
     {
         $additional = '';
         for ($i = 0; $i < 3; $i++) {
@@ -75,7 +85,7 @@ class GeAuthUserGroups extends Model
             $additional .= (string)$num;
         }
 
-        return strtoupper($username[rand(0, strlen($username)-1)] . $username[rand(0, strlen($username)-1)] . '-' . $additional . '-' . $username[rand(0, strlen($username)-1)] . $username[rand(0, strlen($username)-1)]);
+        return strtoupper($username[rand(0, strlen($username)-1)] . $username[rand(0, strlen($username)-1)] . '-' . $additional . '-' . $username[rand(0, strlen($username)-1)] . $username[rand(0, strlen($username)-1)] . '-' . $user_id);
     }
 
 }

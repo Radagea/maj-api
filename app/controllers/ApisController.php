@@ -9,37 +9,46 @@ class ApisController extends ControllerApiBase
     {
         $method = $this->request->getMethod();
 
-        if ($this->isGlobal) {
-            switch ($this->global_endpoint->endpoint_type) {
-                case 1:
-                    $this->globalEndpointList();
-                    break;
-                case 2:
-                    $this->globalEndpointAuth();
-                    break;
-                default:
-                    $this->putError('Endpoint is invalid');
-                    break;
+        try {
+            if ($this->isGlobal) {
+                switch ($this->global_endpoint->endpoint_type) {
+                    case 1:
+                        $this->globalEndpointList();
+                        break;
+                    case 2:
+                        $this->globalEndpointAuth();
+                        break;
+                    default:
+                        $this->putError('Endpoint is invalid');
+                        break;
+                }
+            } else {
+                switch($method) {
+                    case 'GET':
+                        $this->getAction();
+                        break;
+                    case 'POST':
+                        $this->postAction();
+                        break;
+                    case 'PUT':
+                        $this->putAction();
+                        break;
+                    case 'DELETE':
+                        $this->deleteAction();
+                        break;
+                    default:
+                        $this->putError('Unrecognized method', 405);
+                        break;
+                }
             }
-        } else {
-            switch($method) {
-                case 'GET':
-                    $this->getAction();
-                    break;
-                case 'POST':
-                    $this->postAction();
-                    break;
-                case 'PUT':
-                    $this->putAction();
-                    break;
-                case 'DELETE':
-                    $this->deleteAction();
-                    break;
-                default:
-                    $this->putError('Unrecognized method', 405);
-                    break;
+        } catch (Exception $e) {
+            if ($e->getCode()) {
+                $this->putError($e->getMessage(), $e->getCode());
+            } else {
+                $this->putError($e->getMessage());
             }
         }
+
 
         parent::indexAction();
     }
