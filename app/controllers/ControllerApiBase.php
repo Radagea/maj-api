@@ -23,6 +23,8 @@ class ControllerApiBase extends Controller
     protected $user_id;
     protected string $endpoint_uri;
 
+    protected $client_ip;
+
     protected $response_content;
     protected $request_content;
 
@@ -63,6 +65,7 @@ class ControllerApiBase extends Controller
                     $this->isGlobal = true;
                 }
             }
+
         } catch (Exception $e) {
             if ($e->getCode()) {
                 $this->putError($e->getMessage(), $e->getCode());
@@ -210,7 +213,7 @@ class ControllerApiBase extends Controller
             'response_code' => $code,
             'message' => $message,
         ];
-        $status_codes = [404,400,200,300,301];
+        $status_codes = [404,400,200,300,301,500,401];
         if (in_array($code, $status_codes)) {
             $this->response->setStatusCode($code);
         } else {

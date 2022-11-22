@@ -10,6 +10,16 @@ class ApisController extends ControllerApiBase
         $method = $this->request->getMethod();
 
         try {
+            $this->client_ip = $_SERVER['REMOTE_ADDR'];
+
+            $ip_arr = SecurityIp::getIpsAsArray($this->user_id);
+
+            if (!empty($ip_arr)) {
+                if (!in_array($this->client_ip, $ip_arr)) {
+                    throw new Exception('Your IP is not in the access list',401);
+                }
+            }
+
             if ($this->isGlobal) {
                 switch ($this->global_endpoint->endpoint_type) {
                     case 1:

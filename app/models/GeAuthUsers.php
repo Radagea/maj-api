@@ -70,4 +70,9 @@ class GeAuthUsers extends Model
 
         return $this->token;
     }
+
+    public function getUserByToken($token)
+    {
+
+    }
 }

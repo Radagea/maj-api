@@ -13,7 +13,7 @@
         <link rel="shortcut icon" type="image/x-icon" href="<?php echo $this->url->get('img/favicon.ico')?>"/>
     </head>
     <body>
-        {% if router.getControllerName() !== 'login' and router.getControllerName() !== 'register' %}
+        {% if router.getControllerName() !== 'login' and router.getControllerName() !== 'register' and router.getControllerName() !== 'error' %}
             {{ partial('partials/header') }}
         {% endif %}
         {{ flashSession.output() }}
