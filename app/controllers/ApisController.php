@@ -21,6 +21,10 @@ class ApisController extends ControllerApiBase
             }
 
             if ($this->isGlobal) {
+                if ($this->global_endpoint->auth_req) {
+                    echo "aha";
+                }
+
                 switch ($this->global_endpoint->endpoint_type) {
                     case 1:
                         $this->globalEndpointList();

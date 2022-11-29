@@ -45,6 +45,9 @@ $di->setShared('view', function () {
             $config = $this->getConfig();
 
             $volt = new VoltEngine($view, $this);
+            $compiler = $volt->getCompiler();
+            $compiler->addFunction('in_array', 'in_array');
+            $compiler->addFunction('var_dump', 'var_dump');
 
             $volt->setOptions([
                 'path' => $config->application->cacheDir,

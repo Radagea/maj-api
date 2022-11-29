@@ -7,12 +7,10 @@ $(document).ready(function () {
     if ($("#old-groups").val().length) {
         const values = $("#old-groups").val();
         old_groups_arr = values.split(",");
-        console.log(old_groups_arr);
     }
 
     $("#addGroup").click(function (event) {
         event.preventDefault();
-        console.log('clicked');
         makeRow();
     });
 
@@ -37,7 +35,6 @@ $(document).ready(function () {
         $("#group-errors").empty();
         const id = $(this).attr('id');
         const default_group = $("[name='default-user-group-radio']:checked").val();
-        console.log(default_group);
         if (id == default_group) {
             putError('You cant delete the default user group select another');
         } else {

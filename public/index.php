@@ -18,11 +18,9 @@ try {
      * the services that provide a full stack framework.
      */
     $di = new FactoryDefault();
-
     $di->set(
         'dispatcher',
         function() use ($di) {
-
             $evManager = $di->getShared('eventsManager');
 
             $evManager->attach(

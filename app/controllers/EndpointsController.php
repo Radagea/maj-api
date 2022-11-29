@@ -138,7 +138,10 @@ class EndpointsController extends ControllerBase
                 $user_group->setUserId($this->session->get('user_id'));
                 $user_group->setGeId($global_endpoint->id);
                 $user_group->name = $this->request->getPost($new_group . '-name');
-                $user_group->unique_identifier = GeAuthUserGroups::createUniqId($global_endpoint->user->username, $this->session->get('user_id'));
+                $user_group->unique_identifier = GeAuthUserGroups::createUniqId(
+                    $global_endpoint->user->username,
+                    $this->session->get('user_id')
+                );
                 if ($new_group == $default) {
                     $user_group->is_default = 1;
                 } else {
@@ -165,8 +168,28 @@ class EndpointsController extends ControllerBase
                 /** @var GeAuthUserGroups $user_group */
                 $deleted_user_group = GeAuthUserGroups::getFirstFromUserIdAndUniqId($this->session->get('user_id'), $deleted_old_group);
                 //TODO replace all users in this group into the default one
-                if($deleted_user_group != null) {
+                if ($deleted_user_group != null) {
                     $success = $deleted_user_group->delete();
+                }
+            }
+        }
+
+        //Allowed user groups for the API List endpoint
+        if ($global_endpoint->endpoint_type == 1) {
+            $user_groups = GeAuthUserGroups::getFromUserId($this->session->get('user_id'));
+
+            foreach ($user_groups as $group) {
+                $group_setting = GroupsEndpointSettings::getGlobalEndpointGroup($global_endpoint->id, $group->id);
+                if ($this->request->hasPost('group-allow-' . $global_endpoint->id . '-' . $group->id) && !$group_setting) {
+                    $group_setting = new GroupsEndpointSettings();
+                    $group_setting->group_id = $group->id;
+                    $group_setting->ge_id = $global_endpoint->id;
+                    $group_setting->get_allow = 1;
+                    $success = $group_setting->save();
+                }
+
+                if (!$this->request->hasPost('group-allow-' . $global_endpoint->id . '-' . $group->id) && $group_setting) {
+                    $success = $group_setting->delete();
                 }
             }
         }

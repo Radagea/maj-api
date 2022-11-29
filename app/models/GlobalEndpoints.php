@@ -13,6 +13,8 @@ class GlobalEndpoints extends Model
     public $auth_req;
     public $endpoint_type;
 
+    public $group_settings;
+
     public function initialize() {
         $this->setSource('user_global_endpoint');
     }
@@ -25,6 +27,14 @@ class GlobalEndpoints extends Model
                 'user_id' => $this->user_id,
             ]
         ]);
+        $group_settings = GroupsEndpointSettings::find(['conditions' => 'ge_id = :ge_id:', 'bind' => ['ge_id' => $this->id]]);
+        $this->group_settings = [];
+
+        if ($group_settings) {
+            foreach ($group_settings as $group_setting) {
+                $this->group_settings[] = $group_setting->group_id;
+            }
+        }
     }
 
     public static function getGlobalEndpointsByUserId($user_id)

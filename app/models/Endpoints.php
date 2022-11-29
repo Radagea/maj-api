@@ -6,7 +6,7 @@ use Phalcon\Mvc\Model\Behavior\Timestampable;
 class Endpoints extends Model
 {
     public $id;
-    protected $user_id;
+    public $user_id;
     public $user;
     public $endpoint_name;
     public $endpoint_uri;

@@ -83,7 +83,6 @@ class ControllerApiBase extends Controller
         $endpoints_to_content = [];
         foreach ($endpoints as $endpoint) {
             $endpoints_to_content[] = [
-                'id' => $endpoint->id,
                 'endpoint_name' => $endpoint->endpoint_name,
                 'description' => $endpoint->description,
                 'uri' => $endpoint->endpoint_uri,
