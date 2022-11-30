@@ -25,10 +25,10 @@
                     <tr>
                         <th scope="col">{{ group.unique_identifier }}</th>
                         <th scope="col">{{ group.name }}</th>
-                        <th scope="col"><input type="checkbox" name="group-get-{{ endpoint.id }}-{{ group.id }}"></th>
-                        <th scope="col"><input type="checkbox" name="group-post-{{ endpoint.id }}-{{ group.id }}"></th>
-                        <th scope="col"><input type="checkbox" name="group-put-{{ endpoint.id }}-{{ group.id }}"></th>
-                        <th scope="col"><input type="checkbox" name="group-delete-{{ endpoint.id }}-{{ group.id }}" ></th>
+                        <th scope="col"><input type="checkbox" name="group-get-{{ endpoint.id }}-{{ group.id }}" {% if in_array(group.id, endpoint.get_allowed_groups) %} checked {% endif %}></th>
+                        <th scope="col"><input type="checkbox" name="group-post-{{ endpoint.id }}-{{ group.id }}" {% if in_array(group.id, endpoint.post_allowed_groups) %} checked {% endif %}></th>
+                        <th scope="col"><input type="checkbox" name="group-put-{{ endpoint.id }}-{{ group.id }}" {% if in_array(group.id, endpoint.put_allowed_groups) %} checked {% endif %}></th>
+                        <th scope="col"><input type="checkbox" name="group-delete-{{ endpoint.id }}-{{ group.id }}" {% if in_array(group.id, endpoint.delete_allowed_groups) %} checked {% endif %}></th>
                     </tr>
                 {% endfor %}
                 </tbody>

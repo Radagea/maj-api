@@ -11,6 +11,12 @@ class Endpoints extends Model
     public $endpoint_name;
     public $endpoint_uri;
     public $enabled;
+
+    public $enabled_get;
+    public $enabled_post;
+    public $enabled_put;
+    public $enabled_delete;
+
     public $auth_req;
     public $dataset_id;
     public $description; //MAX 120 Character
@@ -18,6 +24,11 @@ class Endpoints extends Model
     public $request_overall;
     public $request_weekly;
     public $request_daily;
+
+    public $get_allowed_groups = [];
+    public $post_allowed_groups = [];
+    public $put_allowed_groups = [];
+    public $delete_allowed_groups = [];
 
     public function initialize()
     {
@@ -42,6 +53,27 @@ class Endpoints extends Model
                 'user_id' => $this->user_id,
             ]
         ]);
+
+        $group_settings = GroupsEndpointSettings::find(['conditions' => 'e_id = :e_id:', 'bind' => ['e_id' => $this->id]]);
+
+        foreach ($group_settings as $group_setting) {
+            if ($group_setting->get_allow) {
+                $this->get_allowed_groups[] = $group_setting->group_id;
+            }
+
+            if ($group_setting->post_allow) {
+                $this->post_allowed_groups[] = $group_setting->group_id;
+            }
+
+            if ($group_setting->put_allow) {
+                $this->put_allowed_groups[] = $group_setting->group_id;
+            }
+
+            if ($group_setting->delete_allow) {
+                $this->delete_allowed_groups[] = $group_setting->group_id;
+            }
+        }
+
     }
 
     public static function normalizeURI($uri,$user_id)

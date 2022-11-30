@@ -39,20 +39,35 @@ class ApisController extends ControllerApiBase
             } else {
                 switch($method) {
                     case 'GET':
+                        if (!$this->endpoint->enabled_get) {
+                            throw new Exception('Method is not allowed', 405);
+                        }
+
                         $this->getAction();
                         break;
                     case 'POST':
+                        if (!$this->endpoint->enabled_post) {
+                            throw new Exception('Method is not allowed', 405);
+                        }
+
                         $this->postAction();
                         break;
                     case 'PUT':
+                        if (!$this->endpoint->enabled_put) {
+                            throw new Exception('Method is not allowed', 405);
+                        }
+
                         $this->putAction();
                         break;
                     case 'DELETE':
+                        if (!$this->endpoint->enabled_delete) {
+                            throw new Exception('Method is not allowed', 405);
+                        }
+
                         $this->deleteAction();
                         break;
                     default:
-                        $this->putError('Unrecognized method', 405);
-                        break;
+                        throw new Exception('Unrecognized method', 405);
                 }
             }
         } catch (Exception $e) {

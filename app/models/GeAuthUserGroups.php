@@ -34,6 +34,8 @@ class GeAuthUserGroups extends Model
                 'user_id' => $this->user_id,
             ]
         ]);
+
+        $this->count = GeAuthUsers::count(['conditions' => 'ge_auth_user_group = :group_id:', 'bind' => ['group_id' => $this->id]]);
     }
 
     public function setGeId($ge_id)

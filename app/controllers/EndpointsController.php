@@ -167,8 +167,11 @@ class EndpointsController extends ControllerBase
             foreach ($deleted_old_groups as $deleted_old_group) {
                 /** @var GeAuthUserGroups $user_group */
                 $deleted_user_group = GeAuthUserGroups::getFirstFromUserIdAndUniqId($this->session->get('user_id'), $deleted_old_group);
-                //TODO replace all users in this group into the default one
+                //TODO - PROBLEM - there is a bug if you want to delete and select new default at the same time
                 if ($deleted_user_group != null) {
+                    $default_user_group = GeAuthUserGroups::findFirst(['conditions' => 'ge_id = :ge_id: AND is_default = 1', 'bind' => ['ge_id' => $global_endpoint->id]]);
+                    $users = new GeAuthUsers();
+                    $users->replaceUsersToGroupByGroup($deleted_user_group->id, $default_user_group->id);
                     $success = $deleted_user_group->delete();
                 }
             }
@@ -212,23 +215,42 @@ class EndpointsController extends ControllerBase
 
         $endpoint->endpoint_name = $this->request->getPost('endpoint-name');
 
-        if ($this->request->hasPost('isEnabled')) {
-            $endpoint->enabled = 1;
-        } else {
-            $endpoint->enabled = 0;
-        }
+        $endpoint->enabled = $this->request->hasPost('isEnabled') ? 1 : 0;
+        $endpoint->auth_req = $this->request->hasPost('isAuthReq') ? 1 : 0;
 
-        if ($this->request->hasPost('isAuthReq')) {
-            $endpoint->auth_req = 1;
-        } else {
-            $endpoint->auth_req = 0;
-        }
+        $endpoint->enabled_get = $this->request->hasPost('isGetEnabled') ? 1 : 0;
+        $endpoint->enabled_post = $this->request->hasPost('isPostEnabled') ? 1 : 0;
+        $endpoint->enabled_put = $this->request->hasPost('isPutEnabled') ? 1 : 0;
+        $endpoint->enabled_delete = $this->request->hasPost('isDeleteEnabled') ? 1 : 0;
 
         $endpoint->dataset_id = 0;
         $endpoint->endpoint_uri = $this->request->getPost('endpoint-uri');
         $endpoint->description = $this->request->getPost('endpoint-desc');
 
         $success = $endpoint->save();
+
+        $user_groups = GeAuthUserGroups::getFromUserId($this->session->get('user_id'));
+        foreach ($user_groups as $group) {
+            $group_setting = GroupsEndpointSettings::getEndpointGroup($endpoint->id, $group->id);
+            if (!$this->request->hasPost('group-get-' . $endpoint->id . '-' . $group->id)
+                && !$this->request->hasPost('group-post-' . $endpoint->id . '-' . $group->id)
+                && !$this->request->hasPost('group-put-' . $endpoint->id . '-' . $group->id)
+                && !$this->request->hasPost('group-delete-' . $endpoint->id . '-' . $group->id) && $group_setting) {
+                    $group_setting->delete();
+            } else {
+                if (!$group_setting) {
+                    $group_setting = new GroupsEndpointSettings();
+                }
+                $group_setting->e_id = $endpoint->id;
+                $group_setting->group_id = $group->id;
+                $group_setting->get_allow = $this->request->hasPost('group-get-' . $endpoint->id . '-' . $group->id) ? 1 : 0;
+                $group_setting->post_allow = $this->request->hasPost('group-post-' . $endpoint->id . '-' . $group->id) ? 1 : 0;
+                $group_setting->put_allow = $this->request->hasPost('group-put-' . $endpoint->id . '-' . $group->id) ? 1 : 0;
+                $group_setting->delete_allow = $this->request->hasPost('group-delete-' . $endpoint->id . '-' . $group->id) ? 1 : 0;
+
+                $success = $group_setting->save();
+            }
+        }
 
         if ($success) {
             $this->flashSession->success('Endpoint has been saved');

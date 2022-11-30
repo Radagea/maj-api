@@ -33,7 +33,7 @@ class GroupsEndpointSettings extends Model
     public static function getEndpointGroup($e_id, $group_id)
     {
         return GroupsEndpointSettings::findFirst([
-            'conditions' => 'e_id => :e_id: AND group_id = :group_id:',
+            'conditions' => 'e_id = :e_id: AND group_id = :group_id:',
             'bind' => [
                 'e_id' => $e_id,
                 'group_id' => $group_id,

@@ -9,6 +9,7 @@
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <button class="nav-link active" id="nav-base-tab-{{ endpoint.id }}" data-bs-toggle="tab" data-bs-target="#nav-base-{{ endpoint.id }}" type="button" role="tab" aria-controls="nav-base-{{ endpoint.id }}" aria-selected="true">Main</button>
                     <button class="nav-link" id="nav-authentication-tab-{{ endpoint.id }}" data-bs-toggle="tab" data-bs-target="#nav-authentication-{{ endpoint.id }}" type="button" role="tab" aria-controls="nav-authentication-{{ endpoint.id }}" aria-selected="false">Authentication</button>
+                    <button class="nav-link" id="nav-methods-tab-{{ endpoint.id }}" data-bs-toggle="tab" data-bs-target="#nav-methods-{{ endpoint.id }}" type="button" role="tab" aria-controls="nav-methods-{{ endpoint.id }}" aria-selected="false">Methods</button>
                 </div>
             </nav>
             <form method="post" action="endpoints/edit?id={{ endpoint.id }}">
@@ -19,6 +20,9 @@
                         </div>
                         <div class="tab-pane fade" id="nav-authentication-{{ endpoint.id }}" role="tabpanel" aria-labelledby="nav-authentication-tab-{{ endpoint.id }}">
                             {{ partial('partials/endpoints/endpoint/authentication') }}
+                        </div>
+                        <div class="tab-pane fade" id="nav-methods-{{ endpoint.id }}" role="tabpanel" aria-labelledby="nav-methods-tab-{{ endpoint.id }}">
+                            {{ partial('partials/endpoints/endpoint/methods') }}
                         </div>
                     </div>
                 </div>

@@ -71,6 +71,11 @@ class GeAuthUsers extends Model
         return $this->token;
     }
 
+    public function replaceUsersToGroupByGroup($from_group_id, $to_group_id) {
+        $phql = "UPDATE GeAuthUsers SET ge_auth_user_group = $to_group_id WHERE ge_auth_user_group = $from_group_id";
+        $records = $this->modelsManager->executeQuery($phql);
+    }
+
     public function getUserByToken($token)
     {
 
