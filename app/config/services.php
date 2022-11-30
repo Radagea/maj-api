@@ -45,19 +45,18 @@ $di->setShared('view', function () {
             $config = $this->getConfig();
 
             $volt = new VoltEngine($view, $this);
+            $volt->setOptions([
+                'path' => $config->application->cacheDir,
+                'separator' => '_',
+            ]);
+
             $compiler = $volt->getCompiler();
             $compiler->addFunction('in_array', 'in_array');
             $compiler->addFunction('var_dump', 'var_dump');
 
-            $volt->setOptions([
-                'path' => $config->application->cacheDir,
-                'separator' => '_'
-            ]);
-
             return $volt;
         },
         '.phtml' => PhpEngine::class
-
     ]);
 
     return $view;
