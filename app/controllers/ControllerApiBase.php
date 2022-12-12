@@ -6,11 +6,13 @@ use JetBrains\PhpStorm\NoReturn;
 use Phalcon\Mvc\Controller;
 use Phalcon\Mvc\Dispatcher;
 use Phalcon\Security;
+
 class ControllerApiBase extends Controller
 {
     //CONST Declarations
     const AUTH_REGISTER_TYPE = 'authreg';
     const AUTH_LOGIN_TYPE = 'authlog';
+    const AUTH_USERS_TYPE = 'authusers';
 
     /** @var Endpoints $endpoint */
     protected $endpoint;
@@ -19,9 +21,12 @@ class ControllerApiBase extends Controller
     protected $global_endpoint;
     protected $isGlobal = false;
 
-    protected string $user_uri;
+    protected $user_uri;
     protected $user_id;
     protected string $endpoint_uri;
+
+    /** @var GeAuthUsers $ge_auth_user */
+    protected $ge_auth_user;
 
     protected $client_ip;
 
@@ -41,38 +46,6 @@ class ControllerApiBase extends Controller
         $this->response->setJsonContent($this->response_content);
         $this->response->send();
         die();
-    }
-
-    public function beforeExecuteRoute(Dispatcher $dispatcher)
-    {
-        try {
-            if (!$this->user_uri = $this->dispatcher->getParam('user_uri')) {
-                throw new Exception('The primary endpoint is not found');
-            }
-
-            if (!$this->endpoint_uri = $this->dispatcher->getParam('endpoint')) {
-                throw new Exception('The secondary endpoint is not found');
-            }
-
-            if (!$this->user_id = Users::getUserIdByUniqueUri($this->user_uri)) {
-                throw new Exception('The primary endpoint is not found');
-            }
-
-            if (!$this->endpoint = Endpoints::getEndpointByUserAndEndpointUri($this->user_id, $this->endpoint_uri)) {
-                if (!$this->global_endpoint = GlobalEndpoints::getEndpointByUserAndEndpointUri($this->user_id, $this->endpoint_uri)) {
-                    throw new Exception('The secondary endpoint is not found');
-                } else {
-                    $this->isGlobal = true;
-                }
-            }
-
-        } catch (Exception $e) {
-            if ($e->getCode()) {
-                $this->putError($e->getMessage(), $e->getCode());
-            } else {
-                $this->putError($e->getMessage());
-            }
-        }
     }
 
     //Global LIST API
@@ -100,7 +73,7 @@ class ControllerApiBase extends Controller
         $method = $this->request->getMethod();
 
         try {
-            if ($method != 'POST' && $method != 'GET') {
+            if ($method != 'POST' && $method != 'GET' && $method != 'PUT') {
                 throw new Exception('This HTTP method is not supported yet');
             }
             if ($method === 'POST') {
@@ -119,7 +92,11 @@ class ControllerApiBase extends Controller
             }
 
             if ($method === 'GET') {
-                echo "get";
+                $this->response_content = ['message' => 'asd'];
+            }
+
+            if ($method === 'PUT') {
+                $this->globalEndpointAuth_PUT_users();
             }
         } catch (Exception $e) {
             if ($e->getCode()) {
@@ -160,6 +137,9 @@ class ControllerApiBase extends Controller
         $GeAuthUser->setUserGroupId($ge_auth_user_group->id);
         $GeAuthUser->save();
 
+        $ge_auth_user_group->count++;
+        $ge_auth_user_group->save();
+
         $this->response_content['code'] = 1;
         $this->response_content['message'] = 'Successfully registered';
     }
@@ -185,10 +165,44 @@ class ControllerApiBase extends Controller
         if ($GeAuthUser && $security->checkHash($pass, $GeAuthUser->password)) {
             $this->response_content['code'] = 2;
             $this->response_content['message'] = 'Logged in';
+            $this->response_content['user_id'] = $GeAuthUser->id;
             $this->response_content['token'] = $GeAuthUser->getToken();
             $this->response_content['expires_at'] = $GeAuthUser->expires_at;
         } else {
             throw new Exception('User not exists or password is incorrect', 3);
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function globalEndpointAuth_PUT_users()
+    {
+        $this->checkFields($this->request_content, self::AUTH_USERS_TYPE);
+
+        if ($this->ge_auth_user = GeAuthUsers::getUserByToken($this->request_content->user_token)) {
+            if ($this->ge_auth_user->user_group->ge_id == $this->global_endpoint->id && $this->ge_auth_user->user_group->is_admin) {
+                $user_id = $this->request_content->user_id;
+                /** @var GeAuthUserGroups $new_group */
+                $new_group = GeAuthUserGroups::getByUniqueId($this->request_content->user_group_unique);
+                /** @var GeAuthUsers $user */
+                $user = GeAuthUsers::findFirst($user_id);
+                $old_group = $user->user_group;
+                $old_group->count = $old_group->count--;
+                $old_group->save();
+                $user->setUserGroupId($new_group->id);
+                $user->save();
+                $new_group->count = $new_group->count+1;
+                $new_group->save();
+                $this->response_content = [
+                    'code' => 2,
+                    'message' => 'User successfully moved into the ' . $new_group->name,
+                ];
+            } else {
+                throw new Exception('Your account cant access to this endpoint', 401);
+            }
+        } else {
+            throw new Exception('Invalid user', 401);
         }
     }
     //End of Authentication API functions
@@ -201,6 +215,12 @@ class ControllerApiBase extends Controller
     {
         if ($type === self::AUTH_REGISTER_TYPE || $type === self::AUTH_LOGIN_TYPE) {
             if ((!isset($arr->user_data)) || (!isset($arr->user_data->email)) || (!isset($arr->user_data->password))) {
+                throw new Exception('One of the required fields is missing, check documentation');
+            }
+        }
+
+        if ($type === self::AUTH_USERS_TYPE) {
+            if ((!isset($arr->user_token)) || (!isset($arr->user_id)) || (!isset($arr->user_group_unique))) {
                 throw new Exception('One of the required fields is missing, check documentation');
             }
         }
@@ -218,7 +238,6 @@ class ControllerApiBase extends Controller
         } else {
             $this->response->setStatusCode(200);
         }
-
     }
 
 }

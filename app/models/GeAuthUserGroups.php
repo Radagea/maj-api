@@ -6,13 +6,14 @@ class GeAuthUserGroups extends Model
 {
     public $id;
     public $unique_identifier;
-    protected $ge_id;
+    public $ge_id;
     public $global_endpoint;
     protected $user_id;
     public $user;
     public $name;
     public $is_default;
     public $count;
+    public $is_admin;
 
     public function initialize()
     {
@@ -65,6 +66,16 @@ class GeAuthUserGroups extends Model
                 'user_id' => $user_id,
                 'is_default' => 1
             ],
+        ]);
+    }
+
+    public static function getByUniqueId($uniq_id)
+    {
+        return GeAuthUserGroups::findFirst([
+            'conditions' => 'unique_identifier = :uniq_id:',
+            'bind' => [
+                'uniq_id' => $uniq_id,
+            ]
         ]);
     }
 

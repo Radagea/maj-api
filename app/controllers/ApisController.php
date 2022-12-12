@@ -7,9 +7,28 @@ class ApisController extends ControllerApiBase
 
     public function indexAction()
     {
-        $method = $this->request->getMethod();
-
         try {
+            if (!$this->user_uri = $this->dispatcher->getParam('user_uri')) {
+                throw new Exception('The primary endpoint is not found');
+            }
+
+            if (!$this->endpoint_uri = $this->dispatcher->getParam('endpoint')) {
+                throw new Exception('The secondary endpoint is not found');
+            }
+
+            if (!$this->user_id = Users::getUserIdByUniqueUri($this->user_uri)) {
+                throw new Exception('The primary endpoint is not found');
+            }
+
+            if (!$this->endpoint = Endpoints::getEndpointByUserAndEndpointUri($this->user_id, $this->endpoint_uri)) {
+                if (!$this->global_endpoint = GlobalEndpoints::getEndpointByUserAndEndpointUri($this->user_id, $this->endpoint_uri)) {
+                    throw new Exception('The secondary endpoint is not found');
+                } else {
+                    $this->isGlobal = true;
+                }
+            }
+
+            $method = $this->request->getMethod();
             $this->client_ip = $_SERVER['REMOTE_ADDR'];
 
             $ip_arr = SecurityIp::getIpsAsArray($this->user_id);
@@ -22,7 +41,17 @@ class ApisController extends ControllerApiBase
 
             if ($this->isGlobal) {
                 if ($this->global_endpoint->auth_req) {
-                    echo "aha";
+                    if (isset($this->request_content->user_token)) {
+                        if ($this->ge_auth_user = GeAuthUsers::getUserByToken($this->request_content->user_token)) {
+                            if (!in_array($this->ge_auth_user->user_group->id, $this->global_endpoint->group_settings)) {
+                                throw new Exception('Your account cant access to this endpoint', 401);
+                            }
+                        } else {
+                            throw new Exception('Invalid user', 401);
+                        }
+                    } else {
+                        throw new Exception('Please first login or use user_token ', 401);
+                    }
                 }
 
                 switch ($this->global_endpoint->endpoint_type) {
@@ -37,6 +66,9 @@ class ApisController extends ControllerApiBase
                         break;
                 }
             } else {
+                if ($this->endpoint->auth_req) {
+                    echo 'asd';
+                }
                 switch($method) {
                     case 'GET':
                         if (!$this->endpoint->enabled_get) {

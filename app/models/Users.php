@@ -13,7 +13,7 @@ class Users extends Model
 
     public function afterCreate()
     {
-        GlobalEndpoints::generateGlobalEndpoints($this->id);
+        GlobalEndpoints::generateGlobalEndpoints($this->id,$this->username);
     }
 
     public function createUri()

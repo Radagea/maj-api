@@ -18,9 +18,9 @@
                     <tr>
                         <th scope="row">{{ group.unique_identifier }}</th>
                         <td><input type="text" class="form-control" name="{{ group.unique_identifier }}-name" value="{{ group.name }}"></td>
-                        <td><input class="form-check-input" type="radio" name="default-user-group-radio" value="{{ group.unique_identifier }}" {% if group.is_default %}checked{% endif %}></td>
+                        <td>{% if group.is_admin == 0 %}<input class="form-check-input" type="radio" name="default-user-group-radio" value="{{ group.unique_identifier }}" {% if group.is_default %}checked{% endif %}> {% endif %}</td>
                         <td>{{ group.count }}</td>
-                        <td><button type="button" class="btn-close" id="{{ group.unique_identifier }}" name="remove-group-element" aria-label="Close"></button></td>
+                        <td>{% if group.is_admin == 0 %}<button type="button" class="btn-close" id="{{ group.unique_identifier }}" name="remove-group-element" aria-label="Close"></button>{% endif %}</td>
                     </tr>
                 {% endfor %}
             </tbody>

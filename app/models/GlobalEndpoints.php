@@ -62,7 +62,7 @@ class GlobalEndpoints extends Model
         );
     }
 
-    public static function generateGlobalEndpoints($user_id)
+    public static function generateGlobalEndpoints($user_id,$user_name)
     {
         $global_endpoint_types = GlobalEndpointType::find();
         foreach ($global_endpoint_types as $global_endpoint_type) {
@@ -72,6 +72,30 @@ class GlobalEndpoints extends Model
             $global_endpoint->endpoint_type = $global_endpoint_type->id;
             $global_endpoint->endpoint_uri = $global_endpoint_type->endpoint_uri;
             $global_endpoint->save();
+            if ($global_endpoint_type->id == 2) {
+                $user_group = new GeAuthUserGroups();
+                $user_group->setUserId($global_endpoint->user_id);
+                $user_group->setGeId($global_endpoint->id);
+                $user_group->name = 'Default user group';
+                $user_group->is_default = 1;
+                $user_group->is_admin = 0;
+                $user_group->unique_identifier = GeAuthUserGroups::createUniqId(
+                    $user_name,
+                    $global_endpoint->user_id
+                );
+                $user_group->save();
+
+                $user_group = new GeAuthUserGroups();
+                $user_group->setUserId($global_endpoint->user_id);
+                $user_group->setGeId($global_endpoint->id);
+                $user_group->name = 'Admin';
+                $user_group->is_admin = 1;
+                $user_group->unique_identifier = GeAuthUserGroups::createUniqId(
+                    $user_name,
+                    $global_endpoint->user_id
+                );
+                $user_group->save();
+            }
         }
     }
 

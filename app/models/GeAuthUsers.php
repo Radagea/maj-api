@@ -76,8 +76,13 @@ class GeAuthUsers extends Model
         $records = $this->modelsManager->executeQuery($phql);
     }
 
-    public function getUserByToken($token)
+    public static function getUserByToken($token)
     {
-
+        return GeAuthUsers::findFirst([
+            'conditions' => 'token = :token:',
+            'bind' => [
+                'token' => $token,
+            ]
+        ]);
     }
 }
