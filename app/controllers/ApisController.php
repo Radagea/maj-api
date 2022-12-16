@@ -67,35 +67,60 @@ class ApisController extends ControllerApiBase
                 }
             } else {
                 if ($this->endpoint->auth_req) {
-                    echo 'asd';
+                    if (isset($this->request_content->user_token)) {
+                        if ($this->ge_auth_user = GeAuthUsers::getUserByToken($this->request_content->user_token)) {
+                            switch ($method) {
+                                case 'GET':
+                                        if (!in_array($this->ge_auth_user->user_group->id, $this->endpoint->get_allowed_groups)){
+                                            throw new Exception('Your account cant access to this endpoint with this method', 401);
+                                        }
+                                    break;
+                                case 'POST':
+                                    if (!in_array($this->ge_auth_user->user_group->id, $this->endpoint->post_allowed_groups)){
+                                        throw new Exception('Your account cant access to this endpoint with this method', 401);
+                                    }
+                                    break;
+                                case 'PUT':
+                                    if (!in_array($this->ge_auth_user->user_group->id, $this->endpoint->put_allowed_groups)){
+                                        throw new Exception('Your account cant access to this endpoint with this method', 401);
+                                    }
+                                    break;
+                                case 'DELETE':
+                                    if (!in_array($this->ge_auth_user->user_group->id, $this->endpoint->delete_allowed_groups)){
+                                        throw new Exception('Your account cant access to this endpoint with this method', 401);
+                                    }
+                                    break;
+                            }
+                        } else {
+                            throw new Exception('Invalid user', 401);
+                        }
+                    } else {
+                        throw new Exception('Please first login or use user_token ', 401);
+                    }
                 }
                 switch($method) {
                     case 'GET':
                         if (!$this->endpoint->enabled_get) {
                             throw new Exception('Method is not allowed', 405);
                         }
-
                         $this->getAction();
                         break;
                     case 'POST':
                         if (!$this->endpoint->enabled_post) {
                             throw new Exception('Method is not allowed', 405);
                         }
-
                         $this->postAction();
                         break;
                     case 'PUT':
                         if (!$this->endpoint->enabled_put) {
                             throw new Exception('Method is not allowed', 405);
                         }
-
                         $this->putAction();
                         break;
                     case 'DELETE':
                         if (!$this->endpoint->enabled_delete) {
                             throw new Exception('Method is not allowed', 405);
                         }
-
                         $this->deleteAction();
                         break;
                     default:

@@ -187,6 +187,10 @@ class ControllerApiBase extends Controller
                 $new_group = GeAuthUserGroups::getByUniqueId($this->request_content->user_group_unique);
                 /** @var GeAuthUsers $user */
                 $user = GeAuthUsers::findFirst($user_id);
+                if  (!$user || $user->main_user_id != $this->user_id) {
+                    throw new Exception('No user with this ID', 400);
+                }
+
                 $old_group = $user->user_group;
                 $old_group->count = $old_group->count--;
                 $old_group->save();
