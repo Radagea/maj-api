@@ -92,7 +92,7 @@ class ControllerApiBase extends Controller
             }
 
             if ($method === 'GET') {
-                $this->response_content = ['message' => 'asd'];
+                $this->globalEndpointAuth_GET_users();
             }
 
             if ($method === 'PUT') {
@@ -105,6 +105,38 @@ class ControllerApiBase extends Controller
                 $this->putError($e->getMessage());
             }
         }
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function globalEndpointAuth_GET_users()
+    {
+        $users = GeAuthUsers::find(
+            [
+                'conditions' => 'main_user_id = :id:',
+                'bind' => [
+                    'id' => $this->user_id,
+                ],
+            ],
+        );
+
+        $users_to_content = [];
+        foreach ($users as $user) {
+            $users_to_content[] = [
+                'id' => $user->id,
+                'email' => $user->email,
+                'username' => $user->username,
+                'phone' => $user->phone,
+                'registered_at' => $user->registered_at,
+                'user_group' => [
+                    'uniq_id' => $user->user_group->unique_identifier,
+                    'name' => $user->user_group->name,
+                ]
+            ];
+        }
+
+        $this->response_content['users'] = $users_to_content;
     }
 
     /**
@@ -183,8 +215,13 @@ class ControllerApiBase extends Controller
         if ($this->ge_auth_user = GeAuthUsers::getUserByToken($this->request_content->user_token)) {
             if ($this->ge_auth_user->user_group->ge_id == $this->global_endpoint->id && $this->ge_auth_user->user_group->is_admin) {
                 $user_id = $this->request_content->user_id;
+
                 /** @var GeAuthUserGroups $new_group */
                 $new_group = GeAuthUserGroups::getByUniqueId($this->request_content->user_group_unique);
+                if (!$new_group) {
+                    throw new Exception('No group with this identifier: ' . $this->request_content->user_group_unique, 400);
+                }
+
                 /** @var GeAuthUsers $user */
                 $user = GeAuthUsers::findFirst($user_id);
                 if  (!$user || $user->main_user_id != $this->user_id) {
